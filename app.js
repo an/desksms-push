@@ -73,6 +73,7 @@ app.post('/event', function(req, res) {
     var data = JSON.parse(req.body.data);
 
     for (var entry in clientEntry.listeners) {
+      console.log('firing event handler');
       entry = clientEntry.listeners[entry];
       entry(data);
     }
@@ -89,7 +90,6 @@ app.post('/event', function(req, res) {
 
 app.get('/wait/:registration_id', function(req, res) {
   res.header('Access-Control-Allow-Origin', '*');
-  console.log('here');
   var client = req.params.registration_id;
   if (client == null) {
     res.send({error: 'no client'});
@@ -99,14 +99,11 @@ app.get('/wait/:registration_id', function(req, res) {
   console.log(client);
 
   var u = 'https://desksms.appspot.com/api/v1/push/' + encodeURIComponent(client);
-  console.log(u);
   ajax(u, function(err, data) {
     if (err) {
       res.send({error: err});
       return;
     }
-    
-    console.log(data);
 
     var clientEntry = clients[client];
     if (!clientEntry) {
@@ -117,7 +114,6 @@ app.get('/wait/:registration_id', function(req, res) {
     var done = false;
     var looper = function() {
       setTimeout(function() {
-        console.log('looper');
         if (done)
           return;
         res.write('\n');
@@ -135,8 +131,6 @@ app.get('/wait/:registration_id', function(req, res) {
 
     var eventHandler = function(data) {
       done = true;
-      console.log(data);
-      console.log('sent');
       var callback = req.query.callback;
       if (callback) {
         res.send(callback + "(" + JSON.stringify(data) + ")");
@@ -147,13 +141,10 @@ app.get('/wait/:registration_id', function(req, res) {
     }
 
     req.on('close', function() {
-      console.log('close');
       done = true;
     });
 
     clientEntry.listeners[eventHandler] = eventHandler;
-    
-    console.log('ajax exit');
   });
   
   console.log('exit');

@@ -107,5 +107,7 @@ app.get('/wait/:client', function(req, res) {
   clientEntry.listeners[eventHandler] = eventHandler;
 });
 
-app.listen(3000);
-console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+
+var listenPort = process.env.PORT == null ? 3000 : parseInt(process.env.PORT);
+app.listen(listenPort);
+console.log('Express app started on port ' + listenPort);

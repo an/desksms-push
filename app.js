@@ -62,8 +62,8 @@ app.post('/event/:client', function(req, res) {
   }
 });
 
-app.get('/wait/:client', function(req, res) {
-  var client = req.params.client;
+app.get('/wait', function(req, res) {
+  var client = req.body.client;
   if (client == null) {
     res.send({error: 'no client'});
     return;
@@ -83,9 +83,14 @@ app.get('/wait/:client', function(req, res) {
       looper();
     }, 30 * 1000);
   };
-  
+
   // 30 second keepalive
   looper();
+
+  // 30 minute timeout
+  setTimeout(function() {
+    res.send({error: 'no data'});
+  }, 30 * 60 * 1000);
 
   var eventHandler = function(data) {
     done = true;

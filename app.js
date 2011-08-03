@@ -138,7 +138,7 @@ app.get('/wait/:registration_id', function(req, res) {
         res.send(callback + "(" + JSON.stringify(data) + ")");
       }
       else {
-        res.write(data);
+        res.write(JSON.stringify(data));
         res.end();
       }
     }

@@ -88,6 +88,7 @@ app.post('/event', function(req, res) {
 });
 
 app.get('/wait/:registration_id', function(req, res) {
+  res.header('Access-Control-Allow-Origin', '*');
   console.log('here');
   var client = req.params.registration_id;
   if (client == null) {
@@ -116,6 +117,7 @@ app.get('/wait/:registration_id', function(req, res) {
     var done = false;
     var looper = function() {
       setTimeout(function() {
+        console.log('looper');
         if (done)
           return;
         res.write('\n');
@@ -145,11 +147,16 @@ app.get('/wait/:registration_id', function(req, res) {
     }
 
     req.on('close', function() {
+      console.log('close');
       done = true;
     });
 
     clientEntry.listeners[eventHandler] = eventHandler;
+    
+    console.log('ajax exit');
   });
+  
+  console.log('exit');
 });
 
 

@@ -88,6 +88,7 @@ app.post('/event', function(req, res) {
 });
 
 app.get('/wait/:registration_id', function(req, res) {
+  console.log('here');
   var client = req.params.registration_id;
   if (client == null) {
     res.send({error: 'no client'});
@@ -148,7 +149,7 @@ app.get('/wait/:registration_id', function(req, res) {
     });
 
     clientEntry.listeners[eventHandler] = eventHandler;
-    });
+  });
 });
 
 

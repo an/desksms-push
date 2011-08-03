@@ -96,8 +96,8 @@ app.get('/wait/:registration_id', function(req, res) {
   
   console.log(client);
 
-  var url = 'https://desksms.appspot.com/api/v1/push/' + encodeURIComponent(client);
-  ajax(url, function(err, data) {
+  var u = 'https://desksms.appspot.com/api/v1/push/' + encodeURIComponent(client);
+  ajax(u, function(err, data) {
     if (err) {
       res.send({error: err});
       return;

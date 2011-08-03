@@ -129,18 +129,19 @@ app.get('/wait/:registration_id', function(req, res) {
     // 30 minute timeout
     setTimeout(function() {
       done = true;
-      res.send({error: 'no data'});
+      res.write(JSON.stringify({error: 'no data'}));
     }, 30 * 60 * 1000);
 
     var eventHandler = function(data) {
       done = true;
       var callback = req.query.callback;
       if (callback) {
-        res.send(callback + "(" + JSON.stringify(data) + ")");
+        res.write(callback + "(" + JSON.stringify(data) + ")");
       }
       else {
-        res.send(JSON.stringify(data));
+        res.write(JSON.stringify(data));
       }
+      res.end();
     }
 
     req.on('close', function() {

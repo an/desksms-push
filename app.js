@@ -36,9 +36,9 @@ app.get('/', function(req, res){
 
 var clients = {};
 
-app.post('/event/:client', function(req, res) {
+app.post('/event', function(req, res) {
   try {
-    var client = req.params.client;
+    var client = req.body.registration_id;
     var clientEntry = clients[client];
     if (!clientEntry) {
       res.send({error: 'no client'});
@@ -62,8 +62,8 @@ app.post('/event/:client', function(req, res) {
   }
 });
 
-app.get('/wait', function(req, res) {
-  var client = req.body.client;
+app.get('/wait/:registration_id', function(req, res) {
+  var client = req.params.registration_id;
   if (client == null) {
     res.send({error: 'no client'});
     return;

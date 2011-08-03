@@ -85,6 +85,7 @@ app.post('/event', function(req, res) {
     delete clients[client];
   }
   catch (e) {
+    console.log(e);
     res.send({error: e});
   }
 });

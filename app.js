@@ -26,6 +26,30 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
+var ajax = function(urlStr, callback) {
+ var u = url.parse(urlStr);
+ http.get({ host: u.host, port: u.port, path: u.pathname + (u.search ? u.search : ''), headers: {'Accept': '*/*', 'User-Agent': 'curl'} },
+   function(res) {
+     var data = '';
+     res.on('data', function(chunk) {
+       data += chunk;
+     }).on('end', function() {
+       try {
+         callback(null, eval("(" + data + ")"));
+       }
+       catch (err) {
+         console.log('exception during ajax');
+         console.log(err);
+         callback(err);
+       }
+     });
+   }).on('error', function(error){
+     console.log('error during ajax');
+     console.log(error);
+     callback(error);
+   });
+}
+
 // Routes
 
 app.get('/', function(req, res){
@@ -68,48 +92,57 @@ app.get('/wait/:registration_id', function(req, res) {
     res.send({error: 'no client'});
     return;
   }
-  var clientEntry = clients[client];
-  if (!clientEntry) {
-    clients[client] = clientEntry = {};
-    clientEntry.listeners = {};
-  }
   
-  var done = false;
-  var looper = function() {
+  var url = 'https://desksms.appspot.com/api/v1/push/' + encodeURIComponent(client);
+  ajax(url, function(err, data) {
+    if (err) {
+      res.send({error: err});
+      return;
+    }
+
+    var clientEntry = clients[client];
+    if (!clientEntry) {
+      clients[client] = clientEntry = {};
+      clientEntry.listeners = {};
+    }
+  
+    var done = false;
+    var looper = function() {
+      setTimeout(function() {
+        if (done)
+          return;
+        res.write('\n');
+        looper();
+      }, 30 * 1000);
+    };
+
+    // 30 second keepalive
+    looper();
+
+    // 30 minute timeout
     setTimeout(function() {
-      if (done)
-        return;
-      res.write('\n');
-      looper();
-    }, 30 * 1000);
-  };
+      res.send({error: 'no data'});
+    }, 30 * 60 * 1000);
 
-  // 30 second keepalive
-  looper();
-
-  // 30 minute timeout
-  setTimeout(function() {
-    res.send({error: 'no data'});
-  }, 30 * 60 * 1000);
-
-  var eventHandler = function(data) {
-    done = true;
-    console.log(data);
-    console.log('sent');
-    var callback = req.query.callback;
-    if (callback) {
-      res.send(callback + "(" + JSON.stringify(data) + ")");
+    var eventHandler = function(data) {
+      done = true;
+      console.log(data);
+      console.log('sent');
+      var callback = req.query.callback;
+      if (callback) {
+        res.send(callback + "(" + JSON.stringify(data) + ")");
+      }
+      else {
+        res.send(data);
+      }
     }
-    else {
-      res.send(data);
-    }
-  }
-  
-  req.on('close', function() {
-    done = true;
-  });
 
-  clientEntry.listeners[eventHandler] = eventHandler;
+    req.on('close', function() {
+      done = true;
+    });
+
+    clientEntry.listeners[eventHandler] = eventHandler;
+    });
 });
 
 

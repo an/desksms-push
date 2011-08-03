@@ -74,6 +74,7 @@ app.post('/event', function(req, res) {
 
     for (var entry in clientEntry.listeners) {
       console.log('firing event handler');
+      console.log(entry);
       entry = clientEntry.listeners[entry];
       entry(data);
     }
@@ -136,7 +137,8 @@ app.get('/wait/:registration_id', function(req, res) {
         res.send(callback + "(" + JSON.stringify(data) + ")");
       }
       else {
-        res.send(data);
+        res.write(data);
+        res.end();
       }
     }
 
@@ -144,7 +146,8 @@ app.get('/wait/:registration_id', function(req, res) {
       done = true;
     });
 
-    clientEntry.listeners[eventHandler] = eventHandler;
+    var now = Date.now();
+    clientEntry.listeners[now] = eventHandler;
   });
   
   console.log('exit');

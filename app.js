@@ -91,7 +91,13 @@ app.get('/wait/:client', function(req, res) {
     done = true;
     console.log(data);
     console.log('sent');
-    res.send(data);
+    var callback = res.query.callback;
+    if (callback) {
+      res.send(callback + "(" + JSON.stringify(data) + ")");
+    }
+    else {
+      res.send(data);
+    }
   }
   
   req.on('close', function() {

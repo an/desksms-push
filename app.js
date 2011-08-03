@@ -128,6 +128,7 @@ app.get('/wait/:registration_id', function(req, res) {
 
     // 30 minute timeout
     setTimeout(function() {
+      done = true;
       res.send({error: 'no data'});
     }, 30 * 60 * 1000);
 
@@ -138,8 +139,7 @@ app.get('/wait/:registration_id', function(req, res) {
         res.send(callback + "(" + JSON.stringify(data) + ")");
       }
       else {
-        res.write(JSON.stringify(data));
-        res.end();
+        res.send(JSON.stringify(data));
       }
     }
 

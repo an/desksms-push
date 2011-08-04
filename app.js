@@ -60,9 +60,33 @@ app.get('/', function(req, res){
 });
 
 var clients = {};
+var lastPush = Date.now();
+
+var healthCheck = function() {
+  setTimeout(healthCheck, 30000);
+  
+  // if we do not get any event notifications for 1 minute,
+  // let's force all clients to sync.
+  if (lastPush + 60000 < Date.now()) {
+    for (var key in clients) {
+      client = clients[key];
+      delete clients[key];
+      if (!client.listeners)
+        continue;
+      for (var entry in client.listeners) {
+        entry = clientEntry.listeners[entry];
+        entry({error: 'server dead'});
+      }
+    }
+  }
+};
+
+healthCheck();
+
 
 app.post('/event', function(req, res) {
   try {
+    lastPush = Date.now();
     var client = req.body.registration_id;
     var clientEntry = clients[client];
     if (!clientEntry) {
@@ -95,6 +119,13 @@ app.post('/event', function(req, res) {
 
 app.get('/wait/:registration_id', function(req, res) {
   res.header('Access-Control-Allow-Origin', '*');
+
+  // if we do not get any event notifications for 1 minute,
+  // tell the client to poll.
+  if (lastPush + 60000 < Date.now()) {
+    res.send({error: 'server dead'}, 404);
+    return;
+  }
 
   var client = req.params.registration_id;
   if (!client || client == 'undefined' || client == 'null') {

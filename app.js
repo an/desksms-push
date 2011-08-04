@@ -123,6 +123,7 @@ app.get('/wait/:registration_id', function(req, res) {
   // if we do not get any event notifications for 1 minute,
   // tell the client to poll.
   if (lastPush + 60000 < Date.now()) {
+    console.log('denying connection due to server death');
     res.send({error: 'server dead'}, 404);
     return;
   }

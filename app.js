@@ -83,6 +83,11 @@ var healthCheck = function() {
 
 healthCheck();
 
+app.get('/ping', function(req, res) {
+  lastPush = Date.now();
+  res.send({success: true});
+});
+
 
 app.post('/event', function(req, res) {
   try {

@@ -69,6 +69,8 @@ app.post('/event', function(req, res) {
       res.send({error: 'no client'});
       return;
     }
+    
+    console.log('event for ' + client);
 
     var data = JSON.parse(req.body.data);
 
@@ -116,10 +118,15 @@ app.get('/wait/:registration_id', function(req, res) {
     var done = false;
     var looper = function() {
       setTimeout(function() {
-        if (done)
-          return;
-        res.write('\n');
-        looper();
+        try {
+          if (done)
+            return;
+          res.write('\n');
+          looper();
+        }
+        catch (e) {
+          console.log(e);
+        }
       }, 30 * 1000);
     };
 
@@ -128,31 +135,46 @@ app.get('/wait/:registration_id', function(req, res) {
 
     // 30 minute timeout
     setTimeout(function() {
-      done = true;
-      res.write(JSON.stringify({error: 'no data'}));
+      try {
+        done = true;
+        res.write(JSON.stringify({error: 'no data'}));
+        res.end();
+      }
+      catch (e) {
+        console.log(e);
+      }
     }, 30 * 60 * 1000);
 
     var eventHandler = function(data) {
-      done = true;
-      var callback = req.query.callback;
-      if (callback) {
-        res.write(callback + "(" + JSON.stringify(data) + ")");
+      try {
+        done = true;
+        var callback = req.query.callback;
+        if (callback) {
+          res.write(callback + "(" + JSON.stringify(data) + ")");
+        }
+        else {
+          res.write(JSON.stringify(data));
+        }
+        res.end();
       }
-      else {
-        res.write(JSON.stringify(data));
+      catch (e) {
+        console.log(e);
       }
-      res.end();
     }
 
     req.on('close', function() {
-      done = true;
+      try {
+        done = true;
+        res.end();
+      }
+      catch (e) {
+        console.log(e);
+      }
     });
 
     var now = Date.now();
     clientEntry.listeners[now] = eventHandler;
   });
-  
-  console.log('exit');
 });
 
 

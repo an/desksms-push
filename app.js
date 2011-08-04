@@ -95,7 +95,7 @@ app.post('/event', function(req, res) {
 app.get('/wait/:registration_id', function(req, res) {
   res.header('Access-Control-Allow-Origin', '*');
   var client = req.params.registration_id;
-  if (client == null) {
+  if (!client) {
     res.send({error: 'no client'});
     return;
   }

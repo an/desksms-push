@@ -87,6 +87,7 @@ app.post('/event', function(req, res) {
     delete clients[client];
   }
   catch (e) {
+    console.log('error in /event');
     console.log(e);
     res.send({error: e});
   }
@@ -100,7 +101,7 @@ app.get('/wait/:registration_id', function(req, res) {
     return;
   }
   
-  console.log(client);
+  console.log('client: ' + client);
 
   var u = 'https://desksms.appspot.com/api/v1/push/' + encodeURIComponent(client);
   ajax(u, function(err, data) {
@@ -125,6 +126,7 @@ app.get('/wait/:registration_id', function(req, res) {
           looper();
         }
         catch (e) {
+          console.log('error in looper');
           console.log(e);
         }
       }, 30 * 1000);
@@ -141,6 +143,7 @@ app.get('/wait/:registration_id', function(req, res) {
         res.end();
       }
       catch (e) {
+        console.log('error in timeout');
         console.log(e);
       }
     }, 30 * 60 * 1000);
@@ -158,6 +161,7 @@ app.get('/wait/:registration_id', function(req, res) {
         res.end();
       }
       catch (e) {
+        console.log('error in event handler');
         console.log(e);
       }
     }
@@ -168,6 +172,7 @@ app.get('/wait/:registration_id', function(req, res) {
         res.end();
       }
       catch (e) {
+        console.log('error in close');
         console.log(e);
       }
     });

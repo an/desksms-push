@@ -94,12 +94,12 @@ app.post('/event', function(req, res) {
 });
 
 app.get('/wait/:registration_id', function(req, res) {
+  res.header('Access-Control-Allow-Origin', '*');
+
   console.log('no client');
   res.send({error: 'no client'}, 404);
   return;
 
-  
-  res.header('Access-Control-Allow-Origin', '*');
   var client = req.params.registration_id;
   if (!client || client == 'undefined' || client == 'null') {
     console.log('no client');

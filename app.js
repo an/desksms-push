@@ -166,8 +166,11 @@ app.get('/wait/:registration_id', function(req, res) {
       }
     }
 
+    var now = Date.now();
     req.on('close', function() {
       try {
+        console.log('close: ' + client);
+        delete clientEntry.listeners[now];
         done = true;
         res.end();
       }
@@ -177,7 +180,6 @@ app.get('/wait/:registration_id', function(req, res) {
       }
     });
 
-    var now = Date.now();
     clientEntry.listeners[now] = eventHandler;
   });
 });

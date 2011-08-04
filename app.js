@@ -94,11 +94,16 @@ app.post('/event', function(req, res) {
 });
 
 app.get('/wait/:registration_id', function(req, res) {
+  console.log('no client');
+  res.send({error: 'no client'}, 404);
+  return;
+
+  
   res.header('Access-Control-Allow-Origin', '*');
   var client = req.params.registration_id;
   if (!client || client == 'undefined' || client == 'null') {
     console.log('no client');
-    res.send({error: 'no client'});
+    res.send({error: 'no client'}, 404);
     return;
   }
   
@@ -108,7 +113,7 @@ app.get('/wait/:registration_id', function(req, res) {
   ajax(u, function(err, data) {
     if (err) {
       console.log('error during ajax');
-      res.send({error: err});
+      res.send({error: err}, 404);
       return;
     }
 

@@ -97,6 +97,7 @@ app.get('/wait/:registration_id', function(req, res) {
   res.header('Access-Control-Allow-Origin', '*');
   var client = req.params.registration_id;
   if (!client || client == 'undefined' || client == 'null') {
+    console.log('no client');
     res.send({error: 'no client'});
     return;
   }
@@ -106,6 +107,7 @@ app.get('/wait/:registration_id', function(req, res) {
   var u = 'https://desksms.appspot.com/api/v1/push/' + encodeURIComponent(client);
   ajax(u, function(err, data) {
     if (err) {
+      console.log('error during ajax');
       res.send({error: err});
       return;
     }
